@@ -1,0 +1,7 @@
+{
+  "name": "youvb",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
