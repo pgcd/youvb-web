@@ -1,0 +1,54 @@
+<ion-header [translucent]="true">
+    <app-header pageTitle="{{action}} Treatment Plan">
+        <ion-buttons slot="end" *ngIf="!isNew">
+            <ion-button (click)="delete()" color="danger">
+                <ion-icon name="trash"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </app-header>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <form [formGroup]="treatmentForm" novalidate (ngSubmit)="save(treatmentForm.value, treatmentForm.valid, treatment)">
+        <ion-item>
+            <ion-input type="text" id="area" formControlName="area" required label="Area" label-placement="stacked"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-select id="treatmentPhase" formControlName="treatmentPhase" labelPlacement="stacked" label="Phase of treatment">
+                <ion-select-option *ngFor="let phase of phases" [value]="phase.key">{{ phase.verbose }}</ion-select-option>
+            </ion-select>
+        </ion-item>
+        <ion-item>
+            <ion-input type="number" id="targetDose" formControlName="targetDose" label="Target duration" labelPlacement="stacked"></ion-input>
+        </ion-item>
+        <!--<ion-item>
+            <ion-label for="lastDoseDuration" floating>Last Run Duration</ion-label>
+            <ion-input type="text" id="lastDoseDuration" formControlName="lastDoseDuration"></ion-input>
+        </ion-item>-->
+        <!--<ion-item>
+            <ion-label for="lastDose" floating>Last Run</ion-label>
+            <ion-datetime id="lastDose" formControlName="lastDose"></ion-datetime>
+        </ion-item>
+        -->
+        <!---->
+        <!--<ion-item>
+            <ion-label for="completedRuns" floating>Completed Runs</ion-label>
+            <ion-input type="text" id="completedRuns" formControlName="completedRuns"></ion-input>
+        </ion-item>-->
+        <ion-item>
+            <ion-input type="number" id="completedRunsInPhase" formControlName="completedRunsInPhase" label="Completed Runs in this phase" labelPlacement="stacked"></ion-input>
+        </ion-item>
+        <!--<ion-item>
+            <ion-label for="runsInPhase" floating>Runs in phase</ion-label>
+            <ion-input type="text" id="runsInPhase" formControlName="runsInPhase"></ion-input>
+        </ion-item>-->
+        <ion-item *ngIf="!isNew">
+            <ion-input type="number" id="nextDoseDuration" formControlName="nextDoseDuration" label="Next duration" labelPlacement="stacked"></ion-input>
+        </ion-item>
+        <!--<ion-item *ngIf="!isNew">
+            <ion-label for="nextDose" floating>Next exposure</ion-label>
+            <ion-datetime displayFormat="DD MMM YY" pickerFormat="DD MMM YY" id="nextDose" formControlName="nextDose"></ion-datetime>
+        </ion-item>-->
+        <ion-button type="submit">Save</ion-button>
+    </form>
+</ion-content>

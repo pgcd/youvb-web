@@ -1,0 +1,69 @@
+<ion-header [translucent]="true">
+    <app-header pageTitle="Exposures by {{ groupByKey | titlecase }}">
+        <ion-buttons slot="end">
+            <ion-button (click)="groupBy('day')">
+                <ion-icon name="calendar"></ion-icon>
+            </ion-button>
+            <ion-button (click)="groupBy('area')">
+                <ion-icon name="hand-left"></ion-icon>
+            </ion-button>
+            <ion-button (click)="presentPopover($event)">
+                <ion-icon name="ellipse"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <!--<ion-buttons end>
+            <button ion-button icon-only (click)="copyData()" color="secondary">
+                <ion-icon name="copy"></ion-icon>
+            </button>
+        </ion-buttons>-->
+    </app-header>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <div class="table-responsive-vertical shadow-z-1">
+        <table class="table table-striped table-mc-teal">
+            <thead>
+            <tr>
+                <th>Area</th>
+                <th>When</th>
+                <th>Duration</th>
+                <th>Phase</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let group of treatmentGroups | async" ngClass="treatment-group">
+            <tr>
+                <th colspan="6" ngClass="group-header" (click)="activeKey = activeKey==group.key?'':group.key">
+                    {{ group.key }} - {{ group.totalExposures }} exposures - {{ group.totalTime | amFromUnix | amDateFormat:"mm:ss" }}
+                </th>
+            </tr>
+            <ng-container *ngIf="group.key === activeKey">
+                <tr class="group-columns">
+                    <th>Area / ID</th>
+                    <th>When</th>
+                    <th>Duration</th>
+                    <th>Phase</th>
+                    <th></th>
+                </tr>
+                <tr *ngFor="let exposure of group.exposures">
+                    <td data-title="Area">{{ exposure.treatmentData.area }} / {{ exposure.treatmentId }}</td>
+                    <td data-title="When">
+                        {{ exposure.when | amDateFormat:'L' }}
+                    </td>
+                    <td data-title="Duration">{{ exposure.runDuration | amFromUnix | amDateFormat:"mm:ss" }} ({{ exposure.runDuration | number:'1.0-0' }} seconds)</td>
+                    <td data-title="Phase">{{ exposure.treatmentData.treatmentPhase }}</td>
+                    <td>
+                        <img *ngIf="exposure.image" (click)="showImage(exposure)" src="{{exposure.image}}" alt="{{exposure.image}}" width="50%">
+                    </td>
+                </tr>
+            </ng-container>
+            </tbody>
+        </table>
+        <ion-button size="full" *ngIf="!fullHistory" (click)="showFullHistory()">Show all treatments (older than two weeks)</ion-button>
+    </div>
+    <ion-fab horizontal="middle" vertical="right">
+        <ion-fab (click)="exportHistory()">
+            <ion-icon name="download" slot="left"></ion-icon>
+        </ion-fab>
+    </ion-fab>
+</ion-content>

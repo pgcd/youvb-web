@@ -1,0 +1,61 @@
+<ion-header [translucent]="true">
+    <app-header pageTitle="Treatments">
+        <ion-buttons slot="end">
+            <ion-button id="todays-plan">
+                <ion-icon name="calendar-number-outline" color="primary"></ion-icon>
+            </ion-button>
+            <ion-button (click)="treatmentDataPopover($event)">
+                <ion-icon name="ellipsis-vertical"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </app-header>
+</ion-header>
+
+<ion-alert
+        trigger="todays-plan"
+        header="Today's plan"
+        message="You have <b>{{planningData.todayExposures}}</b> planned exposures,
+                 for a total of <b>{{planningData.todayTime}}</b>.<br><br>
+            <b>{{planningData.lateExposures}}</b> exposures are late."
+></ion-alert>
+
+<ion-content class="ion-padding">
+    <ion-fab vertical="bottom" horizontal="end" class="ion-padding-end">
+        <ion-fab-button [routerLink]="['/treatments', 'new']">
+            <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+    </ion-fab>
+    <ion-card *ngIf="!treatments">
+        <ion-card-header></ion-card-header>
+        <ion-card-content>
+            <p>To use YouVB, you just have to
+                <a [routerLink]="['/treatments', 'new']">add a treatment plan</a> - enter a name for the area you're about to treat, a target exposure time in seconds
+                and the current phase of treatment (in case you are already at your target duration).</p>
+            <p>During the ramp-up phase, the time will be increased after every successful treatment administered on time, until you reach the target duration.<br/>
+                If, on the other hand, you miss a treatment for several days, the following exposure will be reduced, and the phase will return to ramp-up (even if you had already
+                reached the target).</p>
+            <p>
+                If the treatment is successful, you'll find the area clearing when you are around the target duration - according to the literature I could find,
+                it should take 20 to 30 treatments to see marked improvements (90% clearance). <br/>
+                When this happens, you should manually change the phase of the treatment to "Maintenance 1" (the next maintenance phases require no manual change).
+            </p>
+        </ion-card-content>
+    </ion-card>
+    <ion-list [inset]="true">
+        <ion-item button *ngFor="let treatment of treatments | async" (click)="openTreatment(treatment)"
+                  [ngClass]="[treatmentPhaseClass(treatment), treatmentIsLateClass(treatment)]">
+            <ion-label color="primary">
+                {{ treatment.area | uppercase }} <span *ngIf="treatment.completedRuns">[{{ treatment.completedRuns }} completed]</span>
+            </ion-label>
+            <ion-label color="medium">
+                <p *ngIf="treatment.nextDose">Next: {{ treatment.nextDose | amCalendar }} for {{ treatment.nextDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}
+                </p>
+            </ion-label>
+            <ion-label color="medium">
+                <p *ngIf="treatment.lastDose">Last: {{ treatment.lastDose | amCalendar }} for {{ treatment.lastDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}</p>
+                <ion-icon slot="end" name="warning" color="danger" *ngIf="treatmentIsLate(treatment)>7"></ion-icon>
+                <ion-icon slot="end" name="alarm" color="secondary" *ngIf="treatmentIsLate(treatment)<=7 && treatmentIsLate(treatment)>0"></ion-icon>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>

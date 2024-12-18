@@ -1,0 +1,46 @@
+<ion-header [translucent]="true">
+    <app-header pageTitle="Treatment area: {{treatmentName | uppercase}}"></app-header>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-fab vertical="top" edge horizontal="end" slot="fixed">
+        <ion-fab-button (click)="editTreatment(treatment)"><ion-icon name="create"></ion-icon></ion-fab-button>
+    </ion-fab>
+        <ion-card *ngIf="treatment">
+            <ion-card-header>{{ treatment.completedRuns || "No" }} exposures so far</ion-card-header>
+            <ion-card-content>
+                <p *ngIf="treatment.lastDose">
+                    Last: {{ treatment.lastDose | amCalendar }} for <b>{{ treatment.lastDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}</b>
+                </p>
+                <p>Next: {{ treatment.nextDose | amCalendar }} for <b>{{ treatment.nextDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}</b></p>
+                <p>
+                    Phase: <b>{{ treatment.treatmentPhase }}</b> - {{treatment.completedRunsInPhase}} exposures
+                </p>
+                <p>
+                    Target exposure: {{treatment.targetDose | amFromUnix | amDateFormat:"mm:ss"}}
+                </p>
+            </ion-card-content>
+            <div ngClass="pic-button" class="ion-padding">
+                <img src="{{tempImage.dataUrl}}" alt="" *ngIf="tempImage; else takePic" (click)="takePicture()" id="pre-treatment-photo">
+                <ng-template #takePic>
+                    <ion-button shape="round" (click)="takePicture()"><ion-icon name="camera-outline"></ion-icon></ion-button>
+                </ng-template>
+            </div>
+            <ion-button *ngIf="!use_notifications" color="medium" class="ion-text-center" (click)="allowNotifications()" size="small" fill="clear">
+                <ion-icon name="warning" color="warning"></ion-icon>
+                Local notifications are disabled.<br>
+                You can enable them here.
+            </ion-button>
+        </ion-card>
+        <ion-button [ngClass]="'big-font-timer'" color="dark" size="large" (click)="runTimer()">
+            <span [ngClass]="'timer-' + currentStatus">{{second | amFromUnix | amDateFormat:"mm:ss" }}</span>
+        </ion-button>
+    <ion-list>
+        <ion-list-header *ngIf="history">
+            Last 5 exposures
+        </ion-list-header>
+        <ion-item *ngFor="let item of history | async | slice:0:5">
+            <p>{{item.when | amCalendar }}: {{ item.runDuration | amFromUnix | amDateFormat:"mm:ss"}}</p>
+        </ion-item>
+    </ion-list>
+</ion-content>

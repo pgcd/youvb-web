@@ -1,0 +1,17 @@
+<ion-header [translucent]="true">
+    <app-header pageTitle="About"></app-header>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ion-list>
+        <ion-item class="ion-padding-horizontal" *ngFor="let d of data" (click)="toggleDetails(d)">
+<!--            <ion-icon color="primary" slot="start" [name]="d.icon"></ion-icon>-->
+
+            <ion-label>
+                <h3>{{ d.title }}</h3>
+                <ion-text [innerHtml]="d.details"></ion-text>
+            </ion-label>
+<!--            <ion-text *ngIf="d.showDetails" [innerHtml]="d.details"></ion-text>-->
+        </ion-item>
+    </ion-list>
+</ion-content>

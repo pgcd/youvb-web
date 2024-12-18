@@ -32,6 +32,42 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/*@import "@ionic/angular/css/palettes/dark.always.css";*/
+ @import "@ionic/angular/css/palettes/dark.class.css";
+/*@import '@ionic/angular/css/palettes/dark.system.css';*/
+@import "src/app/about/about.page";
+
+
+$grid-max-widths: (
+ lg: 992px
+);
+
+$grid-breakpoints: (
+ xs: 0, // Phone (0px - 575px)
+ sm: 576px, // Phablet (576px - 767px)
+ md: 768px, // Tablet vertical (768px - 991px)
+ lg: 992px // Tablet horizontal, Desktop (992px and above)
+);
+
+@media (min-width: 1280px) {
+  ion-app {
+    width: 1280px;
+    margin: auto;
+    position: relative;
+    top: 0;
+    bottom: 0;
+    max-width: 1280px;
+  }
+
+  .scroll-content {
+    overflow-y: auto;
+  }
+
+  .plt-desktop body {
+    background: #efefef;
+  }
+ .plt-desktop ion-app {
+   border-left: 1px #cfe0ff outset;
+   border-right: 1px #cfe0ff inset;
+ }
+}
