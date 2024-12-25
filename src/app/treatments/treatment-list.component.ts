@@ -31,6 +31,7 @@ import {
 import {Router, RouterLink} from "@angular/router";
 import {TreatmentDataMenuComponent} from "./treatment-data-menu.component";
 import {HeaderComponent} from "../header/header.component";
+import {HowTo} from "../about/howTo";
 // import { Clipboard } from '@ionic-native/clipboard';
 // import { File } from '@ionic-native/file';
 
@@ -144,4 +145,6 @@ export class TreatmentListComponent {
         console.log(`Popover dismissed with role: ${role}`);
 
     }
+
+    protected readonly HowTo = HowTo;
 }
