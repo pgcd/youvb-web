@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, ReactiveFormsModule} from '@angular/forms';
 import { Store } from '@ngrx/store';
 
 import { AppState } from '../app.state';
-import { TreatmentActions } from './treatment.actions';
+import {addTreatment, deleteTreatment, TreatmentActions, updateTreatment} from './treatment.actions';
 import {CommonModule} from "@angular/common";
 import {ActivatedRoute, Router} from "@angular/router";
 import {
@@ -48,7 +48,7 @@ export class TreatmentFormComponent implements OnInit {
     ngOnInit() {
         this.treatmentForm = this.fb.group({
             area: [''],
-            targetDose: [''],  // Select via MED or skin type
+            targetDoseDuration: [null],  // Select via MED or skin type
             completedRunsInPhase: [0],
             treatmentPhase: [TREATMENT_PHASE_RAMPUP],  // Validate with TreatmentPhases,
             nextDoseDuration: [this.treatment.nextDoseDuration],
@@ -60,11 +60,11 @@ export class TreatmentFormComponent implements OnInit {
         this.submitted = true; // set form submit to true
         if (isValid) {
             if (this.isNew) {
-                this.store.dispatch(this.treatmentActions.addTreatment(model));
+                this.store.dispatch(addTreatment({treatment: model}));
             }
             else {
                 model.id = treatment.id;
-                this.store.dispatch(this.treatmentActions.updateTreatment(model));
+                this.store.dispatch(updateTreatment({treatment: model}));
             }
             this.dismiss();
         } else {
@@ -92,7 +92,7 @@ export class TreatmentFormComponent implements OnInit {
     }
 
     delete() {
-        this.store.dispatch(this.treatmentActions.deleteTreatment(this.treatment));
+        this.store.dispatch(deleteTreatment({treatmentId: this.treatment.id}));
         this.dismiss();
     }
 

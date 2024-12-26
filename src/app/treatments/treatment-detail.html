@@ -17,10 +17,10 @@
                     Phase: <b>{{ treatment.treatmentPhase }}</b> - {{treatment.completedRunsInPhase}} exposures
                 </p>
                 <p>
-                    Target exposure: {{treatment.targetDose | amFromUnix | amDateFormat:"mm:ss"}}
+                    Target exposure: {{treatment.targetDoseDuration | amFromUnix | amDateFormat:"mm:ss"}}
                 </p>
             </ion-card-content>
-            <div ngClass="pic-button" class="ion-padding">
+            <div ngClass="pic-button" class="ion-padding" *ngIf="photosEnabled">
                 <img src="{{tempImage.dataUrl}}" alt="" *ngIf="tempImage; else takePic" (click)="takePicture()" id="pre-treatment-photo">
                 <ng-template #takePic>
                     <ion-button shape="round" (click)="takePicture()"><ion-icon name="camera-outline"></ion-icon></ion-button>

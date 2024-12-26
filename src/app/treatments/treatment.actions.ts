@@ -1,81 +1,53 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { Treatment } from './treatment.model';
-import { Exposure } from './treatment-history.model';
-import {ActionWithPayload} from '../action-with.payload';
+import {Treatment} from './treatment.model';
+import {Exposure} from './treatment-history.model';
+import {createAction, props} from "@ngrx/store";
 
 @Injectable()
 export class TreatmentActions {
-    static LOAD_TREATMENTS = 'LOAD_TREATMENTS';
-    loadTreatments(treatments: Treatment[]): ActionWithPayload {
-        return {
-            type: TreatmentActions.LOAD_TREATMENTS,
-            payload: treatments
-        }
-    }
+    static LOAD_TREATMENTS = '[Treatments] load';
 
-    static LOAD_HISTORY = 'LOAD_HISTORY';
-    loadHistory(history: Exposure[]): ActionWithPayload {
-        return {
-            type: TreatmentActions.LOAD_HISTORY,
-            payload: history
-        }
-    }
+    static LOAD_HISTORY = '[Hostory] load';
 
-    static LOAD_RECENT_HISTORY = 'LOAD_RECENT_HISTORY';
-    loadRecentHistory(): ActionWithPayload {
-        return {
-            type: TreatmentActions.LOAD_RECENT_HISTORY,
-            payload: history
-        }
-    }
+    static LOAD_RECENT_HISTORY = '[History] load recent';
 
-    static TREATMENTS_SAVED = 'TREATMENTS_SAVED';
-    treatmentsSaved(): ActionWithPayload {
-        return {
-            type: TreatmentActions.TREATMENTS_SAVED,
-            payload: {}
-        }
-    }
+    static TREATMENTS_SAVED = '[Treatments] save';
 
-    static ADD_TREATMENT = 'ADD_TREATMENT';
-    addTreatment(treatment: Treatment): ActionWithPayload {
-        return {
-            type: TreatmentActions.ADD_TREATMENT,
-            payload: treatment
-        }
-    }
+    static ADD_TREATMENT = '[Treatments] create';
 
-    static UPDATE_TREATMENT = 'UPDATE_TREATMENT';
-    updateTreatment(treatment: Treatment): ActionWithPayload {
-        return {
-            type: TreatmentActions.UPDATE_TREATMENT,
-            payload: treatment
-        }
-    }
+    static UPDATE_TREATMENT = '[Treatments] update';
 
-    static DELETE_TREATMENT = 'DELETE_TREATMENT';
-    deleteTreatment(treatment: Treatment): ActionWithPayload {
-        return {
-            type: TreatmentActions.DELETE_TREATMENT,
-            payload: treatment.id
-        }
-    }
+    static DELETE_TREATMENT = '[Treatments] delete';
 
-    static TREATMENT_RUN_COMPLETE = 'TREATMENT_RUN_COMPLETE';
-    completeTreatmentRun(payload: {treatment: Treatment, image: any}): ActionWithPayload {
-        return {
-            type: TreatmentActions.TREATMENT_RUN_COMPLETE,
-            payload: payload
-        }
-    }
+    static TREATMENT_RUN_COMPLETE = '[History] complete';
 
-    static TREATMENT_SET_MAINTENANCE = 'TREATMENT_SET_MAINTENANCE';
-    startMaintenancePhase(treatment: Treatment): ActionWithPayload {
-        return {
-            type: TreatmentActions.TREATMENT_SET_MAINTENANCE,
-            payload: treatment.id
-        }
-    }
+    static TREATMENT_SET_MAINTENANCE = '[Treatments] set maintenance';
 
 }
+
+export const loadTreatments = createAction(TreatmentActions.LOAD_TREATMENTS,
+    props<{ treatments: Treatment[] }>())
+
+export const loadRecentHistory = createAction(TreatmentActions.LOAD_RECENT_HISTORY,
+    props<{ history: Exposure[] }>())
+
+export const treatmentsSaved = createAction(TreatmentActions.TREATMENTS_SAVED);
+
+export const addTreatment = createAction(TreatmentActions.ADD_TREATMENT,
+    props<{ treatment: unknown }>())
+
+export const loadHistory = createAction(TreatmentActions.LOAD_HISTORY,
+    props<{ history: Exposure[] }>())
+
+export const startMaintenancePhase = createAction(TreatmentActions.TREATMENT_SET_MAINTENANCE,
+    props<{ treatmentId: number }>())
+
+export const completeTreatmentRun = createAction(TreatmentActions.TREATMENT_RUN_COMPLETE,
+    props<{ treatment: Treatment, image?: any }>())
+
+export const deleteTreatment = createAction(TreatmentActions.DELETE_TREATMENT,
+    props<{ treatmentId: number }>())
+
+export const updateTreatment = createAction(TreatmentActions.UPDATE_TREATMENT,
+    props<{ treatment: Treatment }>())

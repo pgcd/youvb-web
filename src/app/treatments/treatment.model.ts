@@ -1,6 +1,5 @@
-import moment from 'moment';
-import {Injectable} from "@angular/core";
-import {Store, createSelector} from "@ngrx/store";
+import moment, {Moment} from 'moment';
+import {createSelector} from "@ngrx/store";
 import {AppState} from "../app.state";
 
 export const TREATMENT_PHASE_RAMPUP = 'ramp-up';
@@ -87,15 +86,15 @@ export interface Treatment {
 
     id: number,
     area: string,
-    lastDose: Date,  // actually date or datetime
-    nextDose: Date,  // actually date or datetime, computed
+    lastDose: Moment,  // actually date or datetime
+    nextDose: Moment,  // actually date or datetime, computed
     lastDoseDuration: number,
     nextDoseDuration: number,  // actually computed 230 * 1.05,
     completedRuns: number,
     completedRunsInPhase: number,
     runsInPhase: number,
-    targetDose: number,
-    initialDose: number,
+    targetDoseDuration: number,
+    initialDoseDuration: number,
     treatmentPhase: string,  // Validate with TreatmentPhases,
 }
 
@@ -109,20 +108,20 @@ export function getUpdatedTreatment(treatment: Treatment) {
     let completedRuns = Number((treatment.completedRuns || 0)) + 1;
     let completedRunsInPhase = Number((treatment.completedRunsInPhase || 0)) + 1;
     let updatedValues = {
-        initialDose: Number(treatment.initialDose || treatment.nextDoseDuration),
+        initialDoseDuration: Number(treatment.initialDoseDuration || treatment.nextDoseDuration),
         nextDose: null,
         lastDose: new Date(),
-        targetDose: 0
+        targetDoseDuration: 0
     };
-    updatedValues['targetDose'] = Number(treatment.targetDose || (updatedValues.initialDose * 5))  // this assumes 50% MED as initial and twenty 10% MED increase treatments
+    updatedValues['targetDoseDuration'] = Number(treatment.targetDoseDuration || (updatedValues.initialDoseDuration * 5))  // this assumes 50% MED as initial and twenty 10% MED increase treatments
     // Either way, the increase should be a fifth of the initialDose
-    const increment = updatedValues.initialDose / 5;
+    const increment = updatedValues.initialDoseDuration / 5;
     switch (treatment.treatmentPhase) {
         // @ts-expect-error: Fallthrough
         case TREATMENT_PHASE_MAINTENANCE_1:
             if (completedRunsInPhase < 4) {
                 nextPhase = TREATMENT_PHASE_MAINTENANCE_1;
-                nextDuration = treatment.targetDose;
+                nextDuration = treatment.targetDoseDuration;
                 break;
             } else {
                 completedRunsInPhase = 0;  // Reset counter and continue to 2
@@ -131,7 +130,7 @@ export function getUpdatedTreatment(treatment: Treatment) {
         case TREATMENT_PHASE_MAINTENANCE_2:
             if (completedRunsInPhase < 4) {
                 nextPhase = TREATMENT_PHASE_MAINTENANCE_2;
-                nextDuration = treatment.targetDose * 0.75;
+                nextDuration = treatment.targetDoseDuration * 0.75;
                 break;
             } else {
                 completedRunsInPhase = 0;   // Reset counter and continue to 3
@@ -139,7 +138,7 @@ export function getUpdatedTreatment(treatment: Treatment) {
         // eslint-disable-next-line no-fallthrough
         case TREATMENT_PHASE_MAINTENANCE_3:
             nextPhase = TREATMENT_PHASE_MAINTENANCE_3;
-            nextDuration = treatment.targetDose * 0.5;
+            nextDuration = treatment.targetDoseDuration * 0.5;
             break;
         case TREATMENT_PHASE_TARGET:
             nextDuration = treatment.nextDoseDuration;
@@ -148,9 +147,10 @@ export function getUpdatedTreatment(treatment: Treatment) {
         case TREATMENT_PHASE_RAMPUP:
         case undefined:
             nextDuration = Number(treatment.nextDoseDuration) + Number(increment);  // TODO: Move to function
+            console.log("next duration after update", JSON.stringify(nextDuration))
             nextPhase = TREATMENT_PHASE_RAMPUP;
-            if (nextDuration >= treatment.targetDose) {
-                nextDuration = treatment.targetDose;
+            if (nextDuration >= treatment.targetDoseDuration) {
+                nextDuration = treatment.targetDoseDuration;
                 nextPhase = TREATMENT_PHASE_TARGET;
                 completedRunsInPhase = 0;
             }
@@ -158,13 +158,12 @@ export function getUpdatedTreatment(treatment: Treatment) {
     }
 
     const nextDose = moment().add(getTreatmentPhase(nextPhase).intervalDays, 'days');
-
     updatedValues = Object.assign({}, updatedValues, {
         completedRuns: completedRuns,
         completedRunsInPhase: completedRunsInPhase,
-        lastDoseDuration: treatment.nextDoseDuration,
+        lastDoseDuration: Number(treatment.nextDoseDuration),
         nextDose: nextDose,
-        nextDoseDuration: nextDuration ? nextDuration.toFixed(2) : nextDuration,
+        nextDoseDuration: nextDuration ? (nextDuration * 100 + Number.EPSILON) / 100 : nextDuration,
         treatmentPhase: nextPhase,
     });
     return updatedValues;
@@ -186,10 +185,10 @@ export function updateTreatmentOnStart(treatment: Treatment) {
         treatment.nextDoseDuration = treatment.lastDoseDuration * 0.5;
     }
     if (daysLate > 21) {
-        treatment.nextDoseDuration = treatment.initialDose;
+        treatment.nextDoseDuration = treatment.initialDoseDuration;
     }
     // In any case, it should never go below initialDose
-    treatment.nextDoseDuration = Math.max(treatment.nextDoseDuration, treatment.initialDose);
+    treatment.nextDoseDuration = Math.max(treatment.nextDoseDuration, treatment.initialDoseDuration);
     // And, in any case, we should return to ramp-up phase, so we can return to the target dose
     treatment.treatmentPhase = TREATMENT_PHASE_RAMPUP;
     console.log('Treatment updated: ', JSON.stringify(treatment))

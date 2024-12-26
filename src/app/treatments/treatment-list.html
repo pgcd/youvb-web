@@ -40,9 +40,10 @@
                 </p>
             </ion-label>
             <ion-label color="medium">
-                <p *ngIf="treatment.lastDose">Last: {{ treatment.lastDose | amCalendar }} for {{ treatment.lastDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}</p>
-                <ion-icon slot="end" name="warning" color="danger" *ngIf="treatmentIsLate(treatment)>7"></ion-icon>
-                <ion-icon slot="end" name="alarm" color="secondary" *ngIf="treatmentIsLate(treatment)<=7 && treatmentIsLate(treatment)>0"></ion-icon>
+                <ion-icon slot="start" name="warning" color="danger" *ngIf="treatmentIsLate(treatment)>7"></ion-icon>
+                <ion-icon slot="start" name="alarm" color="warning" *ngIf="treatmentIsLate(treatment)<=7 && treatmentIsLate(treatment)>0"></ion-icon>
+                <p *ngIf="treatment.lastDose">Last: {{ treatment.lastDose | amCalendar }} for {{ treatment.lastDoseDuration | amFromUnix | amDateFormat:"mm:ss" }}
+                </p>
             </ion-label>
         </ion-item>
     </ion-list>

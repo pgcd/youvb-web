@@ -23,7 +23,7 @@ import {AppState} from '../app.state';
 import {getTreatment, Treatment, updateTreatmentOnStart} from './treatment.model';
 import {Store} from '@ngrx/store';
 import {Observable, Subscription, timeInterval, timer} from 'rxjs';
-import {TreatmentActions} from './treatment.actions';
+import {completeTreatmentRun, TreatmentActions} from './treatment.actions';
 import moment from 'moment';
 import {ActivatedRoute, Router, RouterLink} from "@angular/router";
 
@@ -47,6 +47,7 @@ import {Directory, Filesystem} from "@capacitor/filesystem";
 })
 export class TreatmentDetailComponent {
     public currentStatus = '';
+    photosEnabled = false;  // temporary flag, until photos are good to go
     treatmentTimerRefresh!: Subscription;
     treatmentRunEnd!: Date;
     second!: number;
@@ -73,6 +74,10 @@ export class TreatmentDetailComponent {
             this.store.select(getTreatment(parseInt(params['id'])))
                 .subscribe((item) => {
                     const initial_treatment: Treatment = item!;
+                    if (!initial_treatment) {
+                        this.router.navigate(['/treatments']);
+                        return
+                    }
                     const treatment = updateTreatmentOnStart(initial_treatment);
                     this.showChanges(initial_treatment, treatment);
                     this.history = this.store.select(state =>
@@ -174,7 +179,7 @@ export class TreatmentDetailComponent {
         this.stopTimer();
         this.treatment = Object.assign({}, this.treatment, {lastDoseDuration: this.fullRun})
         let image = this.saveTempImage()
-        this.store.dispatch(this.treatmentActions.completeTreatmentRun({treatment: this.treatment, image: image}));
+        this.store.dispatch(completeTreatmentRun({treatment: this.treatment, image: image}));
         console.log('complete run at second', this.second, 'of', this.fullRun, this.currentStatus);
         this.zone.run(() => {
         });

@@ -1,29 +1,25 @@
-import {ActionReducer} from '@ngrx/store';
-import {TreatmentActions} from './treatment.actions';
+import {createReducer, on} from '@ngrx/store';
+import {completeTreatmentRun, loadHistory} from './treatment.actions';
 import {Exposure} from './treatment-history.model';
 import moment from 'moment';
 import {concatMap, from, groupBy, Observable, reduce, toArray} from "rxjs";
 import {map, mergeMap} from "rxjs/operators";
-import {ActionWithPayload} from "../action-with.payload";
 
-export const TreatmentHistoryReducer: ActionReducer<Exposure[]> = (state: Exposure[] = [], action: ActionWithPayload) => {
-    switch (action.type) {
-        case TreatmentActions.TREATMENT_RUN_COMPLETE: {
-            const logItem = {
-                treatmentData: action.payload.treatment,
-                when: moment(),
-                runDuration: action.payload.treatment.lastDoseDuration,  // A bit of denormalization
-                treatmentId: action.payload.treatment.id,  // See above
-                image: action.payload.image,
-            }
-            return [...state, logItem];
+const initialState: Exposure[] = [];
+
+export const TreatmentHistoryReducer = createReducer(
+    initialState,
+    on(completeTreatmentRun, (state, {treatment, image}) => {
+        const logItem = {
+            treatmentData: treatment,
+            when: moment().toDate(),
+            runDuration: treatment.lastDoseDuration,  // A bit of denormalization
+            treatmentId: treatment.id,  // See above
+            image: image,
         }
-        case TreatmentActions.LOAD_HISTORY:
-            return action.payload;
-        default:
-            return state;
-    }
-};
+        return [...state, logItem];
+    }),
+    on(loadHistory, (state, {history}) => history))
 
 
 export const latestHistory = () => {
